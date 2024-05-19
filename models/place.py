@@ -2,6 +2,8 @@
 """ Place Module for HBNB project """
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey, Integer, Float
+import os
+from models.review import Review
 
 
 class Place(BaseModel, Base):
@@ -30,3 +32,18 @@ class Place(BaseModel, Base):
     from sqlalchemy.orm import relationship
     cities = relationship("City", back_populates="places")
     user = relationship("User", back_populates="places")
+
+    if os.getenv("HBNB_TYPE_STORAGE") == "db":
+        reviews = relationship(
+                "Review", back_populates="place",
+                cascade="all, delete, delete-orphan"
+                )
+    else:
+        @property
+        def reviews(self):
+            review_instances = []
+            from models import storage
+            for k, v in storage.all(Review).items():
+                if v["place_id"] == self.Place.id:
+                    review_instances.append({k, v})
+            return review_instances
