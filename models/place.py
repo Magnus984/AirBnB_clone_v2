@@ -1,9 +1,25 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, ForeignKey, Integer, Float
+from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 import os
 from models.review import Review
+from models.amenity import Amenity
+
+
+place_amenity = Table(
+        "place_amenity", Base.metadata,
+        Column(
+            'place_id', String(60),
+            ForeignKey('places.id'), primary_key=True,
+            nullable=False
+            ),
+        Column(
+            'amenity_id', String(60),
+            ForeignKey('amenities.id'), primary_key=True,
+            nullable=False
+            )
+        )
 
 
 class Place(BaseModel, Base):
@@ -38,6 +54,10 @@ class Place(BaseModel, Base):
                 "Review", back_populates="place",
                 cascade="all, delete, delete-orphan"
                 )
+        amenities = relationship(
+            "Amenity", secondary=place_amenity,
+            viewonly=False, back_populates="places"
+            )
     else:
         @property
         def reviews(self):
@@ -47,3 +67,17 @@ class Place(BaseModel, Base):
                 if v["place_id"] == self.Place.id:
                     review_instances.append({k, v})
             return review_instances
+
+        @property
+        def amenities(self):
+            amenities_instances = []
+            from models import storage
+            for k, v in storage.all(Amenity).items():
+                if v["amenity.id"] in self.amenity_ids:
+                    amenities_instances.append({k, v})
+            return amenities_instances
+
+        @amenities.setter
+        def amenities(self, obj):
+            if isinstance(obj, Amenity):
+                self.amenity_ids.append(obj.id)
