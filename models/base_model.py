@@ -12,7 +12,11 @@ Base = declarative_base()
 class BaseModel:
     """A base class for all hbnb models"""
 
-    id = Column(String(60), nullable=False, primary_key=True)
+    id = Column(
+            String(60), nullable=False,
+            primary_key=True, unique=True,
+            default=lambda: str(uuid.uuid4())
+            )
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
 
@@ -23,11 +27,17 @@ class BaseModel:
             self.created_at = datetime.utcnow()
             self.updated_at = datetime.utcnow()
         else:
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
+            try:
+                kwargs['updated_at'] = datetime.fromisoformat(
+                        kwargs['updated_at']
+                        )
+                kwargs['created_at'] = datetime.fromisoformat(
+                        kwargs['created_at']
+                        )
+            except (KeyError, ValueError):
+                kwargs["updated_at"] = kwargs["created_at"] = datetime.utcnow()
+
+            kwargs.pop("__class__", None)
             self.__dict__.update(kwargs)
 
     def __str__(self):
@@ -42,7 +52,7 @@ class BaseModel:
     def save(self):
         """Updates updated_at with current time when instance is changed"""
         from models import storage
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.utcnow()
         storage.new(self)
         storage.save()
 
