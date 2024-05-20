@@ -24,7 +24,7 @@ def display_c(text):
 
 @app.route(
         "/python/",
-        defaults={'text': 'cool'},
+        defaults={'text': 'is cool'},
         strict_slashes=False
         )
 @app.route("/python/<text>", strict_slashes=False)
