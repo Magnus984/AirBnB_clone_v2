@@ -11,7 +11,6 @@ app = Flask(__name__)
 
 @app.route("/states_list", strict_slashes=False)
 def list_state():
-    print("i am in route function")
     state_objects = []
     for state in storage.all(State).values():
         state_objects.append(state)
