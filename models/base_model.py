@@ -14,8 +14,7 @@ class BaseModel:
 
     id = Column(
             String(60), nullable=False,
-            primary_key=True, unique=True,
-            default=lambda: str(uuid.uuid4())
+            primary_key=True, unique=True
             )
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
@@ -27,22 +26,22 @@ class BaseModel:
             self.created_at = datetime.utcnow()
             self.updated_at = datetime.utcnow()
         else:
-            try:
-                kwargs['updated_at'] = datetime.fromisoformat(
-                        kwargs['updated_at']
-                        )
-                kwargs['created_at'] = datetime.fromisoformat(
-                        kwargs['created_at']
-                        )
-            except (KeyError, ValueError):
-                kwargs["updated_at"] = kwargs["created_at"] = datetime.utcnow()
+            for key, value in kwargs.items():
+                if key != "__class__":
+                    if key == "created_at" or key == "updated_at":
+                        value = datetime.fromisoformat(value)
+                    setattr(self, key, value)
 
-            kwargs.pop("__class__", None)
-            self.__dict__.update(kwargs)
+            if not hasattr(kwargs, 'id'):
+                setattr(self, 'id', str(uuid.uuid4()))
+            if not hasattr(kwargs, 'created_at'):
+                setattr(self, 'created_at', datetime.utcnow())
+            if not hasattr(kwargs, 'updated_at'):
+                setattr(self, 'updated_at', datetime.utcnow())
 
     def __str__(self):
         """Returns a string representation of the instance"""
-        str1 = "[{:s}] ({:s}) {}"
+        str1 = "[{}] ({}) {}"
         myDict = self.__dict__.copy()
         del myDict['_sa_instance_state']
         return str1.format(
