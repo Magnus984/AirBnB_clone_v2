@@ -10,6 +10,7 @@ from models.amenity import Amenity
 class Place(BaseModel, Base):
     """ A place to stay """
     __tablename__ = 'places'
+    __table_args__ = {'mysql_charset': 'latin1'}
     if os.getenv("HBNB_TYPE_STORAGE") == "db":
         city_id = Column(
                 String(60),
@@ -54,7 +55,8 @@ class Place(BaseModel, Base):
                     'amenity_id', String(60),
                     ForeignKey('amenities.id'), primary_key=True,
                     nullable=False
-                )
+                ),
+                **{'mysql_charset': 'latin1'}
             )
     else:
         city_id = ""
