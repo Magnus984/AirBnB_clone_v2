@@ -8,7 +8,6 @@ import os
 class Review(BaseModel, Base):
     """ Review class to store review information """
     __tablename__ = 'reviews'
-    __table_args__ = {'mysql_charset': 'latin1'}
     if os.getenv("HBNB_TYPE_STORAGE") == 'db':
         place_id = Column(
                 String(60),

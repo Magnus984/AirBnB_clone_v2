@@ -7,7 +7,6 @@ import os
 
 class Amenity(BaseModel, Base):
     __tablename__ = 'amenities'
-    __table_args__ = {'mysql_charset': 'latin1'}
     if os.getenv("HBNB_TYPE_STORAGE") == "db":
         name = Column(String(128), nullable=False)
         from sqlalchemy.orm import relationship
