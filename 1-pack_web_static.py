@@ -16,7 +16,7 @@ def do_pack():
         os.makedirs("versions")
     archive_name = "versions/web_static_{}.tgz".format(
             formatted_datetime)
-    
+
     try:
         local(
                 "tar -cvzf {} web_static".format(
