@@ -10,6 +10,11 @@ import os
 
 
 def do_pack():
+    """
+    Generates a .tgz archive from the contents of the web_static folder.
+    Returns the archive path if the archive has been correctly generated,
+    otherwise None.
+    """
     now = datetime.now()
     formatted_datetime = now.strftime("%Y%m%d%H%M%S")
     if not os.path.exists("versions"):
